@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.lige2333.paipai.dao.BidMapper">
+  <resultMap id="BaseResultMap" type="cn.lige2333.paipai.entity.Bid">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="pro_id" jdbcType="INTEGER" property="proId" />
+    <result column="bid_price" jdbcType="DECIMAL" property="bidPrice" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+      <association property="buyer" javaType="cn.lige2333.paipai.entity.User" columnPrefix="u_">
+          <id property="id" column="id"/>
+          <result property="username" column="username"/>
+          <result property="password" column="password"/>
+          <result column="status" jdbcType="INTEGER" property="status" />
+      </association>
+      <association property="product" javaType="cn.lige2333.paipai.entity.Product" columnPrefix="p_">
+          <id property="id" column="id"/>
+          <result property="name" column="name"/>
+          <result property="sellerId" column="seller_id"/>
+          <result property="currentPrice" column="current_price"/>
+          <result property="startDate" column="start_date"/>
+          <result property="days" column="days"/>
+          <result property="state" column="state"/>
+      </association>
+  </resultMap>
+  <select id="selectByProId" resultMap="BaseResultMap">
+   select b.id,b.bid_price,b.time,b.state,u.id as u_id,u.username as u_username,0 as u_password,p.id as p_id,p.name as p_name,p.current_price as p_current_price,
+   p.start_date as p_start_date,p.seller_id as p_seller_id,p.days as p_days,p.state as p_state from bid b,user u,product p where b.pro_id=#{proId} and b.buyer_id = u.id and b.pro_id=p.id order by bid_price desc
+  </select>
+  <select id="getBidHistory" resultMap="BaseResultMap">
+   select b.id,b.bid_price,b.time,b.state,u.id as u_id,u.username as u_username,0 as u_password,p.id as p_id,p.name as p_name,p.current_price as p_current_price,p.start_date as p_start_date,p.seller_id as p_seller_id,p.days as p_days,p.state as p_state from bid b,user u,product p where b.buyer_id=#{id} and b.buyer_id = u.id and b.pro_id=p.id order by bid_price desc
+  </select>
+  <select id="selectMaxPriceBid" resultMap="BaseResultMap">
+   select b.id,b.bid_price,b.time,b.state,u.id as u_id,u.username as u_username,0 as u_password,p.id as p_id,p.name as p_name,p.current_price as p_current_price,p.start_date as p_start_date,p.seller_id as p_seller_id,p.days as p_days,p.state as p_state from bid b,user u,product p where b.pro_id=#{id} and b.buyer_id = u.id and b.pro_id=p.id and bid_price=(select max(bid_price)
+                  from bid b
+                  where b.pro_id=#{id}
+                  ) order by bid_price desc
+  </select>
+    <update id="updateFailedBidState">
+        update bid set state=2 where bid_price!=(select a.price from (select max(bid_price) price
+                  from bid b
+                  where b.pro_id=#{id}) a) and pro_id=#{id}
+    </update>
+    <update id="updateSuccessBidState">
+        update bid set state=1 where bid_price=(select a.price from (select max(bid_price) price
+                  from bid b
+                  where b.pro_id=#{id}) a) and pro_id=#{id}
+    </update>
+</mapper>

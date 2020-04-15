@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>在线客服聊天室</title>
+    <style type="text/css">
+        .talk_con{
+            width:600px;
+            height:500px;
+            border:1px solid #666;
+            margin:50px auto 0;
+            background:#f9f9f9;
+        }
+        .talk_show{
+            width:580px;
+            height:420px;
+            border:1px solid #666;
+            background:#fff;
+            margin:10px auto 0;
+            overflow:auto;
+        }
+        .talk_input{
+            width:580px;
+            margin:10px auto 0;
+        }
+        .whotalk{
+            width:80px;
+            height:30px;
+            float:left;
+            outline:none;
+        }
+        .talk_word{
+            width:420px;
+            height:26px;
+            padding:0px;
+            float:left;
+            margin-left:10px;
+            outline:none;
+            text-indent:10px;
+        }
+        .talk_sub{
+            width:56px;
+            height:30px;
+            float:left;
+            margin-left:10px;
+        }
+        .atalk{
+            margin:10px;
+        }
+        .atalk span{
+            display:inline-block;
+            background:#0181cc;
+            border-radius:10px;
+            color:#fff;
+            padding:5px 10px;
+        }
+        .btalk{
+            margin:10px;
+            text-align:right;
+        }
+        .btalk span{
+            display:inline-block;
+            background:#ef8201;
+            border-radius:10px;
+            color:#fff;
+            padding:5px 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="talk_con">
+    <div class="talk_show" id="words">
+    </div>
+    <div class="talk_input">
+        <select class="whotalk" id="who">
+        </select>
+        <input type="text" class="talk_word" id="talkwords">
+        <input type="button" value="发送" class="talk_sub" id="talksub">
+    </div>
+</div>
+<script th:src="@{/moon/js/jquery.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script>
+    var select = $('#who');
+
+    var user=getCookie("currUser");
+    var TalkSub = document.getElementById("talksub");
+    var Words = document.getElementById("words");
+
+    var TalkWords = document.getElementById("talkwords");
+
+
+    function getCookie(name){
+        var strcookie = document.cookie;//获取cookie字符串
+        var arrcookie = strcookie.split("; ");//分割
+        //遍历匹配
+        for ( var i = 0; i < arrcookie.length; i++) {
+            var arr = arrcookie[i].split("=");
+            if (arr[0] == name){
+                return arr[1];
+            }
+        }
+        return "";
+    }
+    var socket;
+    if (typeof (WebSocket) == "undefined") {
+        console.log("遗憾：您的浏览器不支持WebSocket");
+    } else {
+
+        //实现化WebSocket对象
+        socket = new WebSocket("ws://localhost:8000/websocket/asset");
+        //连接打开事件
+        socket.onopen = function() {
+            console.log("Socket 已打开");
+            socket.send("用户名@"+user);
+        };
+
+        //收到消息事件
+        socket.onmessage = function(msg) {
+            try {
+                var message=JSON.parse(msg.data);
+                queryOnline();
+                str = '<div class="atalk"><span>'+message.sender+'对'+message.receiver+'说:' + message.messages +'</span></div>' ;
+                Words.innerHTML = Words.innerHTML + str;
+            }catch (e) {
+                console.log(msg.data);
+            }
+
+
+        };
+        //连接关闭事件
+        socket.onclose = function() {
+            console.log("Socket已关闭");
+        };
+        //发生了错误事件
+        socket.onerror = function() {
+            alert("Socket发生了错误");
+        }
+
+        //窗口关闭时，关闭连接
+        window.unload=function() {
+            socket.close();
+        };
+    }
+    $(function () {
+        setTimeout(function () {
+           queryOnline();
+       },100);
+       })
+    function queryOnline(){
+        $.ajax({
+            url : "/getOnlineUsers",
+            type : "POST",
+            data : {},
+            dataType:"JSON",
+            success : function(data) {
+                console.log(data.userlist);
+                select.empty();
+                for (var i=0;i<data.userlist.length;i++){
+                    var selects='<option value="'+data.userlist[i]+'">'+data.userlist[i]+'</option>';
+                    select.append(selects);
+                }
+            }
+
+        });
+    }
+    TalkSub.onclick = function(){
+        var Who = $('#who option:selected').val();
+        //定义空字符串
+        var str = "";
+        if(Who==user){
+            layer.msg("不能给自己发消息！");
+            return;
+        }
+        if(TalkWords.value == ""){
+            // 消息为空时弹窗
+            layer.msg("消息不能为空！");
+            return;
+        }
+        socket.send("消息!@"+user+"!@"+Who+"!@"+TalkWords.value);
+            str = '<div class="btalk"><span>'+user+'对'+Who+'说 :' + TalkWords.value +'</span></div>';
+        Words.innerHTML = Words.innerHTML + str;
+        TalkWords.value="";
+    }
+
+</script>
+</body>
+</html>

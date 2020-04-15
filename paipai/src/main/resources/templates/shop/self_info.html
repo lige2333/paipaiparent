@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	<head>
+		<meta charset="UTF-8">
+        <meta name="author" content="order by dede58.com"/>
+		<title>利哥拍拍-个人中心</title>
+		<link rel="stylesheet" type="text/css" th:href="@{/shop/css/style.css}">
+	</head>
+	<body>
+	<!-- start header -->
+	<header th:replace="shop/Header::topbar">
+	</header>
+	<!--end header -->
+	<!-- start banner_x -->
+		<div class="banner_x center" th:replace="shop/Header::secondbar">
+
+		</div>
+<!-- end banner_x -->
+<!-- self_info -->
+
+	<div class="grzxbj">
+		<div class="selfinfo center">
+		<div class="lfnav fl" th:replace="shop/Header::leftbar(activeUri=${activeUri})">
+
+		</div>
+		<div class="rtcont fr" id="work" th:work="${work}">
+
+		</div>
+		<div class="clear"></div>
+		</div>
+	</div>
+<!-- self_info -->
+		
+		<footer class="mt20 center" th:replace="shop/Header::footer">
+
+		</footer>
+	</body>
+	<script th:src="@{/moon/js/jquery.js}"></script>
+	<script th:src="@{/moon/js/vue.js}"></script>
+	<script th:src="@{/layer/layer.js}"></script>
+	<script th:src="@{/jqform/jquery.form.js}"></script>
+	<script th:src="@{/jqform/jquery.validation.js}"></script>
+	<script>
+		$(function () {
+			var obj1=$("#work");
+			openWork(obj1);
+		})
+		function openWork(obj) {
+			var iframe = "<iframe src='/innerWork/" + $(obj).attr("work")
+					+ "' frameborder=0 width=100% height=100%></iframe>";
+			$("#work").html(iframe);
+		}
+		function logout() {
+			$('#logout').submit();
+		}
+		function showCenter() {
+			layer.open({
+				type : 2,
+				content : 'http://localhost:8000/updateUser',
+				area : [ "80%", "99%" ]
+			});
+		}
+	</script>
+</html>

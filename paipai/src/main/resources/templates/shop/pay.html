@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>支付</title>
+</head>
+<body>
+<form action="http://122.51.138.251:9876/payment" target="_blank">
+    交易号：<input type="text" name="tradeNo" >
+    总价：<input type="text" name="totalAmount">
+    订单名：<input type="text" name="subject">
+    描述：<input type="text" name="body">
+    <input type="submit" value="提交">
+</form>
+<form action="http://122.51.138.251:9876/refund" target="_blank">
+    交易号：<input type="text" name="tradeNo" >
+    总价：<input type="text" name="totalAmount">
+    <input type="submit" value="退款">
+</form>
+
+    <script th:src="@{/moon/js/jquery.js}"></script>
+    <script th:src="@{/layer/layer.js}"></script>
+<script>
+
+</script>
+</body>
+</html>

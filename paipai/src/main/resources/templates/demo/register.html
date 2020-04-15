@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+	<meta charset="UTF-8" />
+	<title>拍拍注册</title>
+	<link rel="stylesheet" th:href="@{/moon/css/bootstrap.css}" type="text/css" />
+	<link rel="stylesheet" th:href="@{/icon/css/font-awesome.min.css}" type="text/css" />
+
+</head>
+<body class="bg-b">
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-sm-10 offset-sm-1">
+			<div class="card border-light">
+				<div class="card-header text-center bg-warning text-white">
+					<i class="fa fa-telegram"></i>&nbsp;利哥拍拍注册
+				</div>
+				<form th:action="@{/userReg}" class="card-body" id="form-reg" method="POST">
+					<table class="table table-light">
+						<TBODY><tr>
+							<td>登录名<small>|6-16位字母数字</small></td>
+							<td>密码<small>|6-16位字母数字</small></td>
+							<td>重复密码</td>
+						</tr>
+						<tr>
+							<td><input class="form-control form-control-sm" name="username" id="username" required="" type="text" /></td>
+							<td><input class="form-control form-control-sm" name="password" id="password" required="" type="password" /></td>
+							<td><input class="form-control form-control-sm" name="confirmPwd" id="confirmPwd" required="" type="password" /></td>
+						</tr>
+						<tr>
+							<td>手机
+								<button class="btn btn-sm btn-outline-warning" id="btn-code" onclick="getcode();" type="button">
+									<small id="check">发送验证码</small>
+								</button>
+							</td>
+							<td>验证码</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><input class="form-control form-control-sm" id="telephone" name="telephone" required="" type="text" /></td>
+							<td><input class="form-control form-control-sm" name="code" required="" type="text" /></td>
+							<td></td>
+						</tr>
+						</TBODY></table>
+					<div class="mt-5">
+						<button class="btn btn-sm btn-outline-warning ml-3" type="submit">提交注册</button>
+						&nbsp;<a class="text-success font-weight-bold" th:href="@{/userlogin}">->去登录</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- js -->
+<script th:src="@{/moon/js/jquery.js}"></script>
+<script th:src="@{/moon/js/vue.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/jqform/jquery.form.js}"></script>
+<script th:src="@{/jqform/jquery.validation.js}"></script>
+<script>
+
+	var time = 10;
+	//ajax-validate-form
+	$("#form-reg").validate({
+		rules:{
+			username:{
+				required:true,
+				rangelength:[6,16],
+				remote:{
+					url:"/checkUsername",
+					type:"post"
+				}
+			},
+			password:{
+				required:true,
+				rangelength:[6,16]
+			},
+			confirmPwd:{
+				equalTo:"#password"
+			},
+			telephone:{
+				required: true,
+				maxlength:11,
+				minlength:11,
+				isMobile:true
+			}
+
+
+		},
+		messages:{
+			username:{
+				required:"请输入用户名",
+				rangelength:"用户名的长度在{0}~{1}之间",
+				remote:"用户名存在！"
+			},
+			password:{
+				required:"请输入密码",
+				rangelength:"密码的长度在{0}~{1}之间"
+			},
+			confirmPwd:{
+				required:"请再次输入密码",
+				equalTo:"两次输入密码不同"
+			},
+			telephone: {
+				required: "请输入手机号",
+				maxlength: "请填写11位的手机号",
+				minlength: "请填写11位的手机号",
+				isMobile: "请填写正确的手机号码"
+			}
+
+		},
+		submitHandler : function() {
+			$("#form-reg").ajaxSubmit(function(data) {
+				if (data != "success") {
+					layer.msg(data);
+					return;
+				}
+				//success
+				layer.alert("注册成功 快去登录吧 <i class='fa fa-smile-o'></i>");
+				$("#form-reg").clearForm();
+			});
+		}
+	});
+
+	jQuery.validator.addMethod("isMobile", function(value, element) {
+		var length = value.length;
+		var mobile = /^(13[0-9]{9})|(18[0-9]{9})|(14[0-9]{9})|(17[0-9]{9})|(15[0-9]{9})$/;
+		return this.optional(element) || (length == 11 && mobile.test(value));
+	}, "请正确填写手机号码");
+	//获取验证码
+	function getcode() {
+
+		//btn-disable
+		$("#btn-code").attr("disabled", true);
+		//post
+		$.ajax({
+			url : "/code/getCode",
+			type : "POST",
+			data : {telephone : $("#telephone").val()},
+			success : function(data) {
+				if (data != "success") {
+					layer.msg(data);
+					return;
+				}
+				//success
+				layer.msg("验证码已发送到您的手机");
+				calTime();
+				timer = window.setInterval(calTime,1000);
+			}
+		});
+
+	}
+	function calTime() {
+		if (time > 0) {
+			$("#check").text("(" + time + "s)后重发");
+			$("#btn-code").prop("disabled", true);
+			time--;
+		} else {
+			window.clearInterval(timer);
+			$("#check").text("点击重发");
+			$("#btn-code").prop("disabled", false);
+			time = 10;
+			return;
+		}
+	}
+
+</script>
+
+</body></html>

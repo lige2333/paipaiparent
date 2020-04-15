@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8" />
+    <title>地址完善</title>
+    <link rel="stylesheet" th:href="@{/moon/css/bootstrap.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/icon/css/font-awesome.min.css}" type="text/css"/>
+</head>
+<body class="bg-b">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-10 offset-sm-1">
+            <div class="card border-light">
+                <div class="card-header text-center bg-warning text-white">
+                    <i class="fa fa-telegram"></i>&nbsp;地址完善
+                </div>
+                <form th:action="@{/addressUp}" class="card-body" id="form-info" method="POST">
+                    <!-- 隐藏域 -->
+                    <input type="hidden" name="orderId" th:value="${orderId}">
+                    <div class="d-none">
+                    </div>
+                    <table class="table table-light">
+                        <TBODY><tr>
+                            <td>省</td>
+                            <td>市</td>
+                            <td>区</td>
+                        </tr>
+                        <tr>
+                            <td><select id="cmbProvince" name="province"
+                                        class="form-control"></select></td>
+                            <td><select id="cmbCity" name="city"
+                                        class="form-control"></select></td>
+                            <td><select id="cmbArea" name="district"
+                                        class="form-control"></select></td>
+                        </tr>
+                        <tr>
+                            <td>详细地址
+
+                            </td>
+                            <td>收货人</td>
+                            <td>电话</td>
+                        </tr>
+                        <tr>
+                            <td><input class="form-control form-control-sm" name="detail" type="text"/></td>
+                            <td><input class="form-control form-control-sm" name="receiver"  type="text" /></td>
+                            <td><input class="form-control form-control-sm" name="telephone"  type="text" /></td>
+                        </tr>
+                        </TBODY></table>
+                    <div class="mt-5">
+                        <button class="btn btn-sm btn-outline-warning ml-3" id="btn-update" type="submit">提交更新</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- js -->
+<script th:src="@{/moon/js/jquery.js}"></script>
+<script th:src="@{/moon/js/vue.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/jqform/jquery.form.js}"></script>
+<script th:src="@{/jqform/jquery.validation.js}"></script>
+<script th:src="@{/myself/js/address.js}"></script>
+<script>
+    //ajax-validate-form
+    var time = 10;
+    addressInit('cmbProvince', 'cmbCity', 'cmbArea');
+    $("#form-info").validate({
+        rules:{
+            province:{
+                required:true
+            },
+            city:{
+                required:true
+            },
+            district:{
+                required: true
+            },
+            detail:{
+                required: true
+            },
+            receiver:{
+                required: true
+            },
+            telephone:{
+                required: true,
+                number:true
+            }
+
+
+        },
+        messages:{
+            province:{
+                required:"请填写省份"
+            },
+            city:{
+                required:"请填写市"
+            },
+            district:{
+                required: "请填写区"
+            },
+            detail:{
+                required: "请填写详情"
+            },
+            receiver:{
+                required: "请填写收货人"
+            },
+            telephone:{
+                required: "请填写电话",
+                number:"请填写正确的电话"
+            }
+
+        },
+        submitHandler : function() {
+            $("#form-info").ajaxSubmit(function(data) {
+                if (data != "success") {
+                    layer.msg(data);
+                    return;
+                }
+                //success
+                layer.msg("更新成功 <i class='fa fa-smile-o'></i>");
+                setbtn($("#btn-update")[0]);
+                var index=parent.layer.getFrameIndex(window.name)
+                setTimeout(function(){
+                    window.parent.location.reload();
+                    parent.layer.close(index);
+                },1000)
+            });
+        }
+
+    });
+    function setbtn(obj) {
+        $(obj).attr("disabled", true);
+        setTimeout(function() {
+            $(obj).attr("disabled", false);
+        }, 5000);
+    }
+
+</script>
+
+</body></html>

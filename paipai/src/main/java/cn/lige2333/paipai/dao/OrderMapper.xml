@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.lige2333.paipai.dao.OrderMapper">
+  <resultMap id="BaseResultMap" type="cn.lige2333.paipai.entity.Order">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="buyer_id" jdbcType="INTEGER" property="buyerId" />
+    <result column="seller_name" jdbcType="VARCHAR" property="sellerName" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <association property="product" javaType="cn.lige2333.paipai.entity.Product" columnPrefix="p_">
+      <id property="id" column="id"/>
+      <result property="name" column="name"/>
+    </association>
+    <association property="address" javaType="cn.lige2333.paipai.entity.Address" columnPrefix="a_">
+      <id property="id" column="id"/>
+      <result property="name" column="name"/>
+      <result property="orderId" column="order_id"/>
+      <result property="province" column="province"/>
+      <result property="city" column="city"/>
+      <result property="district" column="district"/>
+      <result property="detail" column="detail"/>
+      <result property="receiver" column="receiver"/>
+      <result property="telephone" column="telephone"/>
+    </association>
+  </resultMap>
+  <select id="selectByBuyerId" resultMap="BaseResultMap">
+    SELECT o.id,o.buyer_id,o.seller_name,o.price,o.address_id,o.state,p.id as p_id,p.name as p_name,a.id as a_id,
+    a.order_id as a_order_id,a.province as a_province,a.city as a_city,a.district as a_district,a.detail as a_detail,
+    a.receiver as a_receiver,a.telephone as a_telephone
+    FROM `order` o,product p,address a where o.product_id=p.id and o.buyer_id=#{buyerId} and a.id=o.address_id
+  </select>
+  <select id="selectBySellerName" resultMap="BaseResultMap">
+    SELECT o.id,o.buyer_id,o.seller_name,o.price,o.address_id,o.state,p.id as p_id,p.name as p_name,a.id as a_id,
+    a.order_id as a_order_id,a.province as a_province,a.city as a_city,a.district as a_district,a.detail as a_detail,
+    a.receiver as a_receiver,a.telephone as a_telephone
+    FROM `order` o,product p,address a where o.product_id=p.id and o.seller_name=#{sellerName} and a.id=o.address_id
+  </select>
+  <select id="selectByOrderId" resultMap="BaseResultMap">
+    SELECT o.id,o.buyer_id,o.seller_name,o.price,o.address_id,o.state,p.id as p_id,p.name as p_name,a.id as a_id,
+    a.order_id as a_order_id,a.province as a_province,a.city as a_city,a.district as a_district,a.detail as a_detail,
+    a.receiver as a_receiver,a.telephone as a_telephone
+    FROM `order` o,product p,address a where o.product_id=p.id and o.id=#{id} and a.id=o.address_id
+  </select>
+</mapper>

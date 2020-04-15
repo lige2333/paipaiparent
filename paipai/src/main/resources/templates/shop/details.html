@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	<head>
+		<meta charset="UTF-8">
+        <meta name="author" content="order by dede58.com"/>
+		<title>商品详情</title>
+		<link rel="stylesheet" type="text/css" th:href="@{/shop/css/style.css}">
+		<link rel="stylesheet" type="text/css" th:href="@{/flipcountdown/jquery.flipcountdown.css}"/>
+	</head>
+	<body>
+	<header th:replace="shop/Header::topbar">
+	</header>
+	<div class="banner_x center" th:replace="shop/Header::secondbar">
+
+	</div>
+	
+
+	
+	<div class="jieshao mt20 w">
+		<div class="left fl"><img th:src="${prod.image}" style="height: 560px;width: 560px"></div>
+		<div class="right fr">
+			<div class="h3 ml20 mt20" th:text="${prod.name}">小米6</div>
+			<div class="jiage ml20 mt10" th:text="'起拍价格:'+${prod.startPrice}+'元'">2499.00元</div>
+			<div class="ft20 ml20 mt20" th:if="${prod.state==0}">竞拍剩余时间</div>
+			<div class="ft20 ml20 mt20" th:if="${prod.state==3}">开始倒计时</div>
+				<div class="banben fl ml20 mt10" name="retroclockbox" th:time="${prod.expireDate}" th:if="${prod.state==0}">
+
+				</div>
+				<div class="banben fl ml20 mt10" name="retroclockbox" th:time="${prod.startDateString}" th:if="${prod.state==3}">
+
+				</div>
+				<div class="clear"></div>
+
+
+			<div class="xqxq mt20 ml20">
+				<div class="top1 mt10">
+					<div class="left1 fl" th:text="'参与竞拍人数：'+${prod.buyerCount}+'人'"></div>
+					<div class="right1 fr" th:if="${rank!=null}" th:text="'商品围观次数：'+${rank}+'次'"></div>
+					<div class="clear"></div>
+				</div>
+				<div class="bot mt20 ft20 ftbc" th:text="'当前价格：'+${prod.currentPrice}+'元，最小加价：'+${prod.minAddPrice}+'元'">总计：2499元</div>
+			</div>
+			<div class="xiadan ml20 mt20">
+				<form th:action="@{/biddingForProd}">
+					<input type="hidden" name="proId" th:value="${prod.id}" />
+					<input class="jrgwc"  type="button" value="等待竞拍开始" th:if="${prod.state==3}"/>
+					<input class="jrgwc"  type="submit" value="立即竞拍" th:if="${prod.state==0}"/>
+					<input class="jrgwc"  type="button" value="竞拍已结束" th:if="${prod.state==1}"/>
+					<input class="jrgwc"  type="button" value="竞拍已结束" th:if="${prod.state==2}"/>
+					<input class="jrgwc"  type="button" value="收藏" th:if="${prod.state==3}" th:onclick="collection([[${prod.id}]]);"/>
+					<input class="jrgwc"  type="button" value="收藏" th:if="${prod.state==0}" th:onclick="collection([[${prod.id}]]);"/>
+				</form>
+			</div>
+			<div class="ft20 ml20 mt20"><a th:href="'http://connect.qq.com/widget/shareqq/index.html?url=localhost:8000&title='+${prod.name}+'&source=&desc=一件优秀的商品&pics=&summary=一件优秀的商品'">分享到QQ</a></div>
+			<div class="ft20 ml20 mt20">简介</div>
+			<div class="xzbb ml20 mt10">
+				<div th:utext="${prod.details}">
+
+				</div>
+
+			</div>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<!-- footer -->
+	<footer class="mt20 center" th:replace="shop/Header::footer">
+
+	</footer>
+	<script th:src="@{/moon/js/jquery.js}"></script>
+	<script th:src="@{/layer/layer.js}"></script>
+	<script th:src="@{/flipcountdown/jquery.flipcountdown.js}"></script>
+	<script>
+		$(function () {
+			timerLoad()
+		})
+		function collection(proId) {
+			$.ajax({
+				url: "/collectPro",
+				type: "POST",
+				data: {
+					proId: proId
+				},
+				success: function (data) {
+					if (data != "success") {
+						layer.msg(data);
+						return;
+					}
+					//success
+					layer.msg("收藏成功！");
+				}
+			});
+		}
+		function timerLoad() {
+			var timers = $('div[name="retroclockbox"]');
+			for (i = 0; i < timers.length; i++) {
+				var time = timers.eq(i).attr("time")
+				timers.eq(i).flipcountdown({
+					size: 'sm',
+					beforeDateTime: time
+				});
+			}
+		}
+		function logout() {
+			$('#logout').submit();
+		}
+		var socket;
+		if (typeof (WebSocket) == "undefined") {
+			console.log("遗憾：您的浏览器不支持WebSocket");
+		} else {
+
+			//实现化WebSocket对象
+			socket = new WebSocket("ws://localhost:8000/websocket/asset");
+			//连接打开事件
+			socket.onopen = function() {
+				console.log("Socket 已打开");
+				socket.send("消息发送测试(From Client)");
+			};
+			//收到消息事件
+			socket.onmessage = function(msg) {
+				if(msg.data=="start"||msg.data=="nobody"||msg.data=="end"){
+					setTimeout(function(){
+						location.reload();
+					},500);
+				}
+			};
+			//连接关闭事件
+			socket.onclose = function() {
+				console.log("Socket已关闭");
+			};
+			//发生了错误事件
+			socket.onerror = function() {
+				alert("Socket发生了错误");
+			}
+
+			//窗口关闭时，关闭连接
+			window.unload=function() {
+				socket.close();
+			};
+		}
+	</script>
+	</body>
+</html>

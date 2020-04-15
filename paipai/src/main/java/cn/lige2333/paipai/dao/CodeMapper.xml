@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.lige2333.paipai.dao.CodeMapper">
+  <resultMap id="BaseResultMap" type="cn.lige2333.paipai.entity.Code">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="rancode" jdbcType="VARCHAR" property="rancode" />
+    <result column="telephone" jdbcType="VARCHAR" property="telephone" />
+    <result column="expire_date" jdbcType="TIMESTAMP" property="expireDate" />
+  </resultMap>
+</mapper>

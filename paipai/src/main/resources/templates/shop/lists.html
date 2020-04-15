@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="order by dede58.com"/>
+    <title>拍品列表</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/shop/css/style.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/flipcountdown/jquery.flipcountdown.css}"/>
+    <link rel="stylesheet" th:href="@{/moon/css/bootstrap.css}" />
+</head>
+<body>
+<header th:replace="shop/Header::topbar">
+</header>
+<input type="hidden" id="keyword" th:value="${keyword}">
+<input type="hidden" id="status" th:value="${state}">
+<input type="hidden" name="district" th:value="${district}" id="dist">
+<input type="hidden" name="category" th:value="${categorys}" id="cate">
+
+<div >
+<form th:action="@{/findProductByKeyword}" method="post">
+<div class="row mt-2">
+        <input type="hidden" class="shuru" name="pageNum" value="1">
+
+    <div>
+        <span>分类：</span>
+        <select id="category" name="category" class="form-control">
+            <option th:each="cate:${category}"
+                    th:value="${cate.name}" th:text="${cate.name}">
+            <option value="" selected>请选择</option>
+            </option>
+        </select>
+    </div>
+    <div class="col-sm-3 offset-sm-1">
+        <span>省：</span>
+        <select id="cmbProvince"
+                class="form-control" name="province"></select>
+    </div>
+    <div>
+        <span>市：</span>
+        <select id="cmbCity"
+                class="form-control" name="city"></select>
+    </div>
+    <div>
+        <span>区：</span>
+        <select id="cmbArea"
+                class="form-control" name="area"></select>
+    </div>
+         <div class="col-sm-3 offset-sm-1">
+             <span>状态：</span>
+             <select id="state" class="form-control" name="state">
+                 <option value="0" th:selected="${state=='0'?'true':'false'}">竞拍中</option>
+                 <option value="3" th:selected="${state=='3'?'true':'false'}">等待竞拍开始</option>
+             </select>
+         </div>
+        <div class="col-sm-3">
+            <span>关键字：</span>
+            <input type="text" class="form-control form-control-user" name="keyword"  placeholder="大别野" th:value="${keyword!=null?keyword:''}">
+        </div>
+        <div class="col-sm-2">
+            <input type="submit" class="btn btn-primary btn-user btn-block ml-2" value="搜索"/>
+        </div>
+        <div class="clear"></div>
+
+</div>
+</form>
+</div>
+
+</div>
+<div class="danpin center" id="app">
+
+    <div class="biaoti center">拍品</div>
+
+    <div class="main center">
+        <div class="mingxing fl mb20" style="border:2px solid #fff;width:230px;cursor:pointer;"
+             onmouseout="this.style.border='2px solid #fff'" onmousemove="this.style.border='2px solid red'"
+             v-for="product in productdata">
+            <div class="sub_mingxing"><a :href="'/findProductById?id='+product.id" target="_blank"><img :src="product.image"
+                                                                                  alt=""></a></div>
+            <div class="pinpai"><a :href="'/findProductById?id='+product.id" target="_blank">{{product.name}}</a></div>
+            <div class="youhui" name="retroclockbox" :time="product.expireDate" v-if="product.state=='0'">剩余时间：</div>
+            <div class="youhui" name="retroclockbox" :time="product.startDateString" v-if="product.state=='3'">开始时间：</div>
+            <div class="jiage">{{product.currentPrice}}元</div>
+        </div>
+        <div class="clear"></div>
+        <div class="col-md-offset-4 col-lg-offset-4 col-xl-offset-4">
+            <div id="pager" class="pagination pagination-sm "></div>
+        </div>
+    </div>
+
+</div>
+
+
+<script th:src="@{/moon/js/jquery.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/menu/metisMenu.js}"></script>
+<script th:src="@{/moon/js/popper.js}"></script>
+<script th:src="@{/moon/js/bootstrap.js}"></script>
+<script th:src="@{/flipcountdown/jquery.flipcountdown.js}"></script>
+<script th:src="@{/page/jqpaginator.js}"></script>
+<script th:src="@{/moon/js/vue.js}"></script>
+<script th:src="@{/myself/js/address.js}"></script>
+<script>
+    addressInit('cmbProvince', 'cmbCity', 'cmbArea');
+    var pageNum = 1;
+    var keyword=$("#keyword").val();
+    var state=$("#status").val();
+    var district=$("#dist").val();
+    var category=$("#cate").val();
+    var app = new Vue({
+        el: "#app",
+        data: {
+            productdata: [],
+            keyword: ""
+        },
+        methods: {
+            showstudentdata: function () {
+                $.ajax({
+                    url: "/queryProduct",
+                    type: "POST",
+                    data: {
+                        keyword: keyword,
+                        state: state,
+                        currentPage: pageNum,
+                        category:category,
+                        district:district,
+                        pageSize: 5
+                    },
+                    success: function (data) {
+                        app.productdata = data.list;
+                        //动态改变pager:totalPages
+                        $("#pager").jqPaginator("option", {
+                            totalPages: data.pagecount
+                        });
+
+                       setTimeout(function(){
+                           timerLoad();
+                       },100);
+                    }
+                });
+            }
+        },
+
+    });
+
+    function timerLoad() {
+        var timers = $('div[name="retroclockbox"]');
+        for (i = 0; i < timers.length; i++) {
+            var time = timers.eq(i).attr("time")
+            timers.eq(i).flipcountdown({
+                size: 'xs',
+                beforeDateTime: time
+            });
+        }
+    }
+
+    $("#pager").jqPaginator({
+        totalPages: 1,
+        currentPage: 1,
+        onPageChange: function (num, type) {
+            pageNum = num;
+            app.showstudentdata();
+        }
+    });
+
+    function logout() {
+        $('#logout').submit();
+    }
+
+</script>
+
+
+</body>
+</html>

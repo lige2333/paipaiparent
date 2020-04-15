@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/shop/css/style.css}">
+</head>
+<body>
+<header th:fragment="topbar">
+<div class="top center">
+    <div class="left fl">
+        <ul>
+            <li><a th:href="@{/}" target="_blank">首页</a></li>
+            <li>|</li>
+            <li><a href="https://王利啊.我爱你/" target="_blank">利哥技术博客</a></li>
+            <li>|</li>
+            <li><a href="http://bookstore.王利啊.我爱你/">书城</a></li>
+            <li>|</li>
+            <li><a href="http://class.王利啊.我爱你/">网上课堂</a></li>
+            <li>|</li>
+            <li><a href="http://pan.王利啊.我爱你/">利哥云盘</a></li>
+            <li>|</li>
+            <li><a href="http://bbs.王利啊.我爱你/">利哥论坛</a></li>
+            <li>|</li>
+            <li><a href="http://shop.lige2333.cn/index.jsp">彩票亭</a></li>
+            <li>|</li>
+            <li><a href="http://p2p.lige2333.cn/index.do">利哥金融</a></li>
+            <li>|</li>
+            <li><a href="http://panel.lige2333.cn/login.html">利哥金融管理</a></li>
+            <div class="clear"></div>
+        </ul>
+    </div>
+    <div class="right fr">
+        <div class="fr">
+            <ul>
+                <li><a th:href="@{/userlogin}" target="_blank" sec:authorize="!isAuthenticated()">登录</a></li>
+                <li><a th:href="@{/openWork/info}" target="_blank" sec:authorize="isAuthenticated()"><span sec:authentication="name"></span></a></li>
+                <li>|</li>
+                <li><a th:href="@{/register}" target="_blank" sec:authorize="!isAuthenticated()">注册</a></li>
+                <li><a href="javascript:;" target="_blank" sec:authorize="isAuthenticated()" onclick="logout();">注销</a></li>
+            </ul>
+            <form th:action="@{/logout}" method="post" id="logout">
+            </form>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="clear"></div>
+</div>
+</header>
+<div class="banner_x center" th:fragment="secondbar">
+    <a th:href="@{/}" target="_blank"><div class="logo fl"></div></a>
+    <a href=""><div class="ad_top fl"></div></a>
+    <div class="nav fl">
+        <ul>
+            <li><a th:href="@{/list?keyword=&state=0}" target="_blank">商品浏览</a></li>
+            <li><a th:href="@{/openWork/upload}" th:style="${activeUri=='upload'?'color:#ff6700;font-weight:bold;':''}">拍卖申请</a></li>
+            <li><a th:href="@{/openWork/info}" th:style="${activeUri=='info'?'color:#ff6700;font-weight:bold;':''}">个人中心</a></li>
+            <li><a th:href="@{/openWork/proDetails}" th:style="${activeUri=='proDetails'?'color:#ff6700;font-weight:bold;':''}">我的商品</a></li>
+            <li><a th:href="@{/openWork/order}" th:style="${activeUri=='order'?'color:#ff6700;font-weight:bold;':''}">我的订单</a></li>
+        </ul>
+    </div>
+    <div class="search fr">
+        <form th:action="@{/findProductByKeyword}" method="post">
+            <input type="hidden" class="shuru" name="pageNum" value="1">
+            <div class="text fl">
+                <input type="hidden" name="state" value="0">
+                <input type="text" class="shuru" name="keyword"  placeholder="大别野" th:value="${keyword!=null?keyword:''}">
+            </div>
+            <div class="submit fl">
+                <input type="submit" class="sousuo" value="搜索"/>
+            </div>
+            <div class="clear"></div>
+        </form>
+        <div class="clear"></div>
+    </div>
+</div>
+<div class="lfnav fl" th:fragment="leftbar">
+    <div class="ddzx">买家中心</div>
+    <div class="subddzx">
+        <ul>
+            <li><a th:href="@{/openWork/order}" th:style="${activeUri=='order'?'color:#ff6700;font-weight:bold;':''}">我的订单</a></li>
+            <li><a th:href="@{/openWork/history}" th:style="${activeUri=='history'?'color:#ff6700;font-weight:bold;':''}">出价历史</a></li>
+            <li><a th:href="@{/openWork/message}" th:style="${activeUri=='message'?'color:#ff6700;font-weight:bold;':''}">消息中心</a></li>
+            <li><a th:href="@{/openWork/collections}" th:style="${activeUri=='collections'?'color:#ff6700;font-weight:bold;':''}">我的收藏</a></li>
+        </ul>
+    </div>
+    <div class="ddzx">卖家中心</div>
+    <div class="subddzx">
+        <ul>
+            <li><a th:href="@{/openWork/info}" th:style="${activeUri=='info'?'color:#ff6700;font-weight:bold;':''}">我的个人中心</a></li>
+            <li><a th:href="@{/openWork/upload}" th:style="${activeUri=='upload'?'color:#ff6700;font-weight:bold;':''}">商品上传</a></li>
+            <li><a th:href="@{/openWork/proDetails}" th:style="${activeUri=='proDetails'?'color:#ff6700;font-weight:bold;':''}">拍品详情</a></li>
+            <li><a th:href="@{/openWork/sellerOrder}" th:style="${activeUri=='sellerOrder'?'color:#ff6700;font-weight:bold;':''}">拍卖订单</a></li>
+        </ul>
+    </div>
+</div>
+<footer class="mt20 center" th:fragment="footer">
+    <div>lige2333.cn</div>
+    <div>利哥拍拍</div>
+</footer>
+</body>
+</body>
+</html>

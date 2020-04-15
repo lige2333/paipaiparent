@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8" />
+    <title>拍拍登陆</title>
+    <link rel="stylesheet" th:href="@{/moon/css/bootstrap.css}"  type="text/css" />
+    <link rel="stylesheet" th:href="@{/edit/wangEditor.css}"  type="text/css" />
+    <link rel="stylesheet" th:href="@{/icon/css/font-awesome.min.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/upload/css/uploader.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/date/flatpickr.css}" type="text/css"/>
+
+</head>
+<body class="bg-c">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col text-center bg-success text-white shadow">商品上传</div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card border-light">
+                <form th:action="@{/createProduct}" class="card-body" id="crePro" method="POST">
+                    <input type="hidden" name="image" id="image">
+                    <input type="hidden" name="details" id="details">
+                    <input type="hidden" name="district" id="district">
+                    <div>商品名</div>
+                    <div>
+                        <input class="form-control form-control-sm" name="name" type="text" />
+                    </div>
+                    <div>起拍价</div>
+                    <div>
+                        <input class="form-control form-control-sm" name="startPrice" type="text" />
+                    </div>
+                    <div>最小加价</div>
+                    <div>
+                        <input class="form-control form-control-sm" name="minAddPrice" type="text" />
+                    </div>
+                    <div>开始日期</div>
+                    <div>
+                        <input class="form-control form-control-sm" name="startDate" id="startDate" type="text" />
+                    </div>
+                    <div>拍卖天数</div>
+                    <div>
+                        <input class="form-control form-control-sm" name="days" type="text" />
+                    </div>
+                    <div>商品分类</div>
+                    <div>
+                        <select id="category" name="category" class="form-control">
+                            <option th:each="cate:${category}"
+                                    th:value="${cate.name}" th:text="${cate.name}"></option>
+                        </select>
+                    </div>
+                    <div>卖家区域</div>
+                    <div>
+                        <select id="cmbProvince"
+                                    class="form-control"></select>
+                        <select id="cmbCity"
+                                    class="form-control"></select>
+                        <select id="cmbArea"
+                                    class="form-control"></select>
+                    </div>
+
+                    <div>商品详情</div>
+                    <div>
+
+                        <div id="editor">
+
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-sm btn-outline-success" type="submit">提交</button>
+                    </div>
+                </form>
+                <div>封面图片上传</div>
+                <div class="row mt-2">
+                    <div class="col-sm-3">
+                        <button class="btn btn-sm btn-danger" id="btn-upl">上传</button>
+                    </div>
+                    <div class="mt-2" id="prev"></div>
+                    <div class="col-sm-9">
+                        <div id="taskbar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- js -->
+<script th:src="@{/moon/js/jquery.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/edit/wangEditor.js}"></script>
+<script th:src="@{/jqform/jquery.form.js}"></script>
+<script th:src="@{/jqform/jquery.validation.js}"></script>
+<script th:src="@{/upload/js/uploader.js}"></script>
+<script th:src="@{/date/flatpickr.js}"></script>
+<script th:src="@{/myself/js/address.js}"></script>
+<script type="text/javascript">
+    var E = window.wangEditor
+    var editor = new E('#editor')
+    editor.create()
+    addressInit('cmbProvince', 'cmbCity', 'cmbArea');
+    new Q.Uploader({
+        url:"/uploadFile",
+        target: $("#btn-upl")[0],
+        view: $("#taskbar")[0],
+        upName:"file",
+        dataType:"text",
+        on: {
+            complete: function (task) {
+                $('#image').val(task.response)
+            }
+        }
+    });
+    $("#crePro").validate({
+        rules:{
+            name:{
+                required:true
+            },
+            startPrice:{
+                required:true,
+                number:true
+            },
+            minAddPrice:{
+                required:true,
+                number:true
+            },
+            days:{
+                required: true,
+                max:30
+            },
+            category:{
+                required:true
+            }
+
+
+        },
+        messages:{
+            name:{
+                required:"请输入商品名",
+            },
+            startPrice:{
+                required:"请输入起拍价",
+                number:"请输入数字"
+            },
+            minAddPrice:{
+                required:"请输入最低加价",
+                number:"请输入数字"
+            },
+            days: {
+                required: "请输入天数",
+                max: "最大不能超过30天"
+            },
+            category:{
+                required:"请输入分类名",
+            },
+
+        },
+        submitHandler : function() {
+            if($('#image').val()==""||$('#image').val()==null){
+                layer.msg("请上传图片！");
+                return;
+            }
+            var text =editor.txt.html();
+            if(text==""||text==null){
+                layer.msg("请描述商品详情！");
+                return;
+            }
+            var province = $('#cmbProvince').val();
+            var city = $('#cmbCity').val();
+            var area = $('#cmbArea').val();
+            var dist = province+city+area;
+            $('#details').val(text);
+            $('#district').val(dist);
+            $("#crePro").ajaxSubmit(function(data) {
+                if (data.msg != "success") {
+                    layer.msg(data.msg);
+                    return;
+                }
+                //success
+                layer.msg("商品发布成功,请耐心等待审核！");
+                $("#crePro").clearForm();
+                setTimeout(function(){
+                    location.reload();
+                },500);
+            });
+        }
+    });
+    $("#startDate").flatpickr({
+        minDate: new Date(),
+        maxDate: new Date().getTime()+7*24*60*60*1000,
+        enableTime:true,
+        enableSeconds:true,
+        time_24hr:true
+    });
+</script>
+</body>
+</html>

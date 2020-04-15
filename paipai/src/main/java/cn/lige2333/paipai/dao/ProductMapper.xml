@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.lige2333.paipai.dao.ProductMapper">
+  <resultMap id="SmallResultMap" type="cn.lige2333.paipai.entity.Product">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="state" jdbcType="VARCHAR" property="state" />
+    <result column="start_date" jdbcType="TIMESTAMP" property="startDate" />
+    <result column="days" jdbcType="INTEGER" property="days" />
+  </resultMap>
+  <resultMap id="BaseResultMap" type="cn.lige2333.paipai.entity.Product">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="start_price" jdbcType="DECIMAL" property="startPrice" />
+    <result column="min_add_price" jdbcType="DECIMAL" property="minAddPrice" />
+    <result column="current_price" jdbcType="DECIMAL" property="currentPrice" />
+    <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
+    <result column="image" jdbcType="VARCHAR" property="image" />
+    <result column="state" jdbcType="VARCHAR" property="state" />
+    <result column="details" jdbcType="VARCHAR" property="details" />
+    <result column="start_date" jdbcType="TIMESTAMP" property="startDate" />
+    <result column="days" jdbcType="INTEGER" property="days" />
+    <result column="district" jdbcType="VARCHAR" property="district" />
+    <result column="category" jdbcType="VARCHAR" property="category" />
+    <collection column="id" ofType="cn.lige2333.paipai.entity.Bid" property="bids" select="cn.lige2333.paipai.dao.BidMapper.selectByProId" />
+  </resultMap>
+
+  <select id="selectCountByConditions" resultType="int">
+    SELECT count(*) FROM product
+    <where>
+      <if test="keyword!=null and keyword!=''">
+        and id in
+        <foreach collection="keys" item="state" open="(" close=")" separator=",">
+          #{state}
+        </foreach>
+      </if>
+      <if test="state!=null">
+        and state=#{state}
+      </if>
+      <if test="category!=null and category!=''">
+        and category=#{category}
+      </if>
+      <if test="district!=null and district!=''">
+        and district=#{district}
+      </if>
+      <if test="sellerId!=null and sellerId!=''">
+        and seller_id=#{sellerId}
+      </if>
+    </where>
+  </select>
+  <select id="selectByConditions" resultMap="BaseResultMap">
+    SELECT * FROM product
+    <where>
+      <if test="keyword!=null and keyword!=''">
+        and id in
+        <foreach collection="keys" item="state" open="(" close=")" separator=",">
+          #{state}
+        </foreach>
+      </if>
+      <if test="state!=null">
+        and state=#{state}
+      </if>
+      <if test="category!=null and category!=''">
+        and category=#{category}
+      </if>
+      <if test="district!=null and district!=''">
+        and district=#{district}
+      </if>
+      <if test="sellerId!=null and sellerId!=''">
+        and seller_id=#{sellerId}
+      </if>
+    </where>
+    limit #{start},#{pageSize}
+  </select>
+  <select id="selectById" resultMap="BaseResultMap">
+    SELECT * FROM product
+    where id=#{id}
+  </select>
+  <select id="selectByState" resultMap="BaseResultMap">
+    SELECT * FROM product
+    where state=#{state}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    SELECT * FROM product
+  </select>
+  <select id="selectAllBySmall" resultMap="SmallResultMap">
+    SELECT id,name,state,start_date,days FROM product where state=0 or state=3 or state=5
+  </select>
+  <select id="selectBySellerId" resultMap="BaseResultMap">
+    SELECT * FROM product where seller_id=#{id}
+  </select>
+</mapper>

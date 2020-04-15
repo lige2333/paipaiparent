@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8" />
+    <title>拍拍登陆</title>
+    <link rel="stylesheet" th:href="@{/moon/css/bootstrap.css}"  type="text/css" />
+    <link rel="stylesheet" th:href="@{/edit/wangEditor.css}"  type="text/css" />
+    <link rel="stylesheet" th:href="@{/icon/css/font-awesome.min.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/upload/css/uploader.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/date/flatpickr.css}" type="text/css"/>
+
+</head>
+<body class="bg-c">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col text-center bg-success text-white shadow">商品上传</div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card border-light">
+                <form th:action="@{/send}" class="card-body" id="crePro" method="POST">
+                    <input type="hidden" name="content" id="content">
+                    <div>收件人</div>
+                    <div>
+                        <input class="form-control form-control-sm" name="receiver" type="text" />
+                    </div>
+
+                    <div>消息内容</div>
+                    <div>
+
+                        <div id="editor">
+
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-sm btn-outline-success" type="submit">提交</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- js -->
+<script th:src="@{/moon/js/jquery.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/edit/wangEditor.js}"></script>
+<script th:src="@{/jqform/jquery.form.js}"></script>
+<script th:src="@{/jqform/jquery.validation.js}"></script>
+<script th:src="@{/upload/js/uploader.js}"></script>
+<script th:src="@{/date/flatpickr.js}"></script>
+<script type="text/javascript">
+    var E = window.wangEditor
+    var editor = new E('#editor')
+    editor.create()
+
+    $("#crePro").validate({
+        rules:{
+            receiver:{
+                required:true
+            }
+
+        },
+        messages:{
+            receiver:{
+                required:"请输入收件人",
+            }
+
+        },
+        submitHandler : function() {
+            var text =editor.txt.html();
+            if(text==""||text==null){
+                layer.msg("请填写信息！");
+                return;
+            }
+            $('#content').val(text);
+            $("#crePro").ajaxSubmit(function(data) {
+                if (data != "success") {
+                    layer.msg(data.msg);
+                    return;
+                }
+                //success
+                layer.msg("消息发送成功！");
+                $("#crePro").clearForm();
+                setTimeout(function(){
+                    window.parent.location.reload();
+                    parent.layer.close(index);
+                },1000)
+            });
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	<head>
+		<meta charset="UTF-8">
+		<title>利哥拍拍</title>
+		<link rel="stylesheet" type="text/css" th:href="@{/shop/css/style.css}">
+		<link rel="stylesheet" type="text/css" th:href="@{/flipcountdown/jquery.flipcountdown.css}" />
+
+	</head>
+	<body>
+		<header th:replace="shop/Header::topbar">
+		</header>
+		<div class="banner_x center" th:replace="shop/Header::secondbar">
+		</div>
+		<div class="danpin center">
+			<div class="biaoti center">明星拍品</div>
+			<div class="main center">
+				<div class="mingxing fl" th:each="product:${products}">
+					<div class="sub_mingxing"><a th:href="'/findProductById?id='+${product.id}"><img th:src="${product.image}" alt=""></a></div>
+					<div class="pinpai"><a th:href="'/findProductById?id='+${product.id}" th:text="${product.name}">小米MIX</a></div>
+					<div class="youhui"name="retroclockbox" th:time="${product.expireDate}" th:if="${product.state==0}">剩余时间：</div>
+					<div class="youhui"name="retroclockbox" th:time="${product.startDateString}" th:if="${product.state==3}">竞拍开始：</div>
+					<div class="jiage" th:text="${product.currentPrice}+'元'"></div>
+				</div>
+				<div class="clear"></div>
+			</div>
+		</div>
+
+	<footer class="mt20 center" th:replace="shop/Header::footer">
+
+	</footer>
+	<script th:src="@{/moon/js/jquery.js}"></script>
+	<script th:src="@{/layer/layer.js}"></script>
+	<script th:src="@{/menu/metisMenu.js}"></script>
+	<script th:src="@{/moon/js/popper.js}"></script>
+	<script th:src="@{/moon/js/bootstrap.js}"></script>
+	<script th:src="@{/flipcountdown/jquery.flipcountdown.js}"></script>
+	<script>
+		var timers=$('div[name="retroclockbox"]')
+		$(function () {
+			for (i=0;i<timers.length;i++){
+				var time=timers.eq(i).attr("time")
+				timers.eq(i).flipcountdown({
+					size:'xs',
+					beforeDateTime:time
+				});
+			}
+		})
+		function logout() {
+			$('#logout').submit();
+		}
+	</script>
+	</body>
+</html>
