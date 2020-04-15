@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/shop/css/style.css}">
+</head>
+<body>
+<header th:fragment="topbar">
+<div class="top center">
+    <div class="left fl">
+        <ul>
+            <li><a th:href="@{/}" target="_blank">首页</a></li>
+            <li>|</li>
+            <li><a href="https://王利啊.我爱你/" target="_blank">利哥技术博客</a></li>
+            <li>|</li>
+            <li><a href="http://bookstore.王利啊.我爱你/">书城</a></li>
+            <li>|</li>
+            <li><a href="http://class.王利啊.我爱你/">网上课堂</a></li>
+            <li>|</li>
+            <li><a href="http://pan.王利啊.我爱你/">利哥云盘</a></li>
+            <li>|</li>
+            <li><a href="http://bbs.王利啊.我爱你/">利哥论坛</a></li>
+            <li>|</li>
+            <li><a href="http://shop.lige2333.cn/index.jsp">彩票亭</a></li>
+            <li>|</li>
+            <li><a href="http://p2p.lige2333.cn/index.do">利哥金融</a></li>
+            <li>|</li>
+            <li><a href="http://panel.lige2333.cn/login.html">利哥金融管理</a></li>
+            <div class="clear"></div>
+        </ul>
+    </div>
+    <div class="clear"></div>
+</div>
+</header>
+<div class="lfnav fl" th:fragment="leftbar">
+    <div class="ddzx">管理中心</div>
+    <div class="subddzx">
+        <ul>
+            <li><a th:href="@{/openWork/order}" th:style="${activeUri=='order'?'color:#ff6700;font-weight:bold;':''}">我的订单</a></li>
+            <li><a th:href="@{/openWork/history}" th:style="${activeUri=='history'?'color:#ff6700;font-weight:bold;':''}">操作日志</a></li>
+            <li><a th:href="@{/openWork/proAudit}" th:style="${activeUri=='proAudit'?'color:#ff6700;font-weight:bold;':''}">商品审核</a></li>
+        </ul>
+    </div>
+    <div class="ddzx">用户中心</div>
+    <div class="subddzx">
+        <ul>
+            <li><a th:href="@{/openWork/info}" th:style="${activeUri=='info'?'color:#ff6700;font-weight:bold;':''}">我的个人中心</a></li>
+            <li><a th:href="@{/openWork/user}" th:style="${activeUri=='user'?'color:#ff6700;font-weight:bold;':''}">用户管理</a></li>
+            <li><a th:href="@{/openWork/proDetails}" th:style="${activeUri=='proDetails'?'color:#ff6700;font-weight:bold;':''}">拍品详情</a></li>
+        </ul>
+    </div>
+</div>
+<footer class="mt20 center" th:fragment="footer">
+    <div>lige2333.cn</div>
+    <div>利哥拍拍</div>
+</footer>
+</body>
+</body>
+</html>
