@@ -11,7 +11,6 @@
         <module name="log" />
         <module name="message" />
         <module name="eureka" />
-        <module name="paipai" />
         <module name="paipaiadmin" />
       </profile>
     </annotationProcessing>
